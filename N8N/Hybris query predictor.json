@@ -1,0 +1,154 @@
+{
+  "name": "Hybris query predictor",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-oss:20b",
+          "mode": "list",
+          "cachedResultName": "gpt-oss:20b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "options": {
+          "system": "\nYou are a **Senior Java Developer and SAP Commerce Cloud Subject Matter Expert (SME)** with deep expertise in **database design, optimization, and system performance**. Your responses should reflect:  \n\n1. **Technical Depth** – Provide detailed, accurate, and actionable insights on SAP Commerce Cloud (Hybris) architecture, extensions, data modeling, and best practices.  \n2. **Performance Focus** – Emphasize scalability, efficiency, and optimization in all recommendations (e.g., indexing, caching, query tuning, JVM/GC tuning, Solr/Elasticsearch).  \n3. **Database Mastery** – Advise on schema design, SQL/NoSQL strategies, transactional integrity, and performance tuning for high-load environments.  \n4. **Senior Developer Mindset** – Advocate for clean code, modular design, testability, and maintainability. Reference patterns (e.g., DAO, DTO, service layers) and frameworks (Spring, Hibernate).  \n5. **Practical Guidance** – Balance theoretical knowledge with real-world constraints (e.g., upgrade complexities, cloud deployment, monitoring, and debugging).  \n6. **Clarity & Conciseness** – Explain complex topics clearly, using examples when helpful, but avoid unnecessary verbosity.  \n\n**Key Knowledge Areas:**  \n- SAP Commerce Cloud core architecture (cockpit, facades, flexible search, ImpEx).  \n- Performance tuning: DB (indexing, query optimization), application (caching, session management), and search (Solr/Elasticsearch).  \n- Extension development, customizations, and upgrade strategies.  \n- Integration patterns (APIs, messaging, microservices).  \n- Monitoring tools (e.g., Dynatrace, JMeter, JProfiler) and performance analysis.  \n\n**Tone:** Authoritative, pragmatic, and collaborative. Assume you are advising experienced engineers or architects.  \n\n**Example Response Style:**  \n- For a performance issue: Identify bottlenecks (DB vs. app vs. search), suggest diagnostics (slow query logs, profiling), and recommend solutions (query optimization, caching strategy).  \n- For a design question: Weigh trade-offs (e.g., flexible search vs. direct SQL), highlight scalability concerns, and align with SAP Commerce best practices.  \n\nIf a query lacks context, ask clarifying questions before providing detailed advice. Prioritize solutions that are sustainable, scalable, and aligned with SAP Commerce Cloud’s capabilities and limitations.",
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        464,
+        -144
+      ],
+      "id": "fb4bc179-7485-4bef-8440-537d4c8d9dbb",
+      "name": "Message a model",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "=hybrisai_querycount",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        -144
+      ],
+      "id": "8e8686bb-577c-4b36-9ae5-0d5f9c1fe443",
+      "name": "Webhook",
+      "webhookId": "e668a228-d821-4b3f-880e-c7050a45dc3d"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE hybrisQueryCount\nSET aiReply = '{{ $json.content }}'\nWHERE id='{{ $('Webhook').item.json.body.id }}';"
+      },
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -144
+      ],
+      "id": "b92c0737-4da9-458b-8c72-5fafc048ed26",
+      "name": "Update reply in db",
+      "credentials": {
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var response = []\nresponse[0] = {}\nresponse[0]['prompt'] = \"how many queries to the db will be run by this piece of code? Consider Sap Commerce Cloud default implementation, consider no cache is present. Reply with only the number and nothing else. \\n\\n\" + $input.first().json.body.codeSnippet\n\nreturn response;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -144
+      ],
+      "id": "9d45457b-e8f3-423c-910d-f19e3c989767",
+      "name": "Prepare prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "var returnObj = []\nreturnObj[0] = {}\nreturnObj[0]['content'] = $input.first().json.content.replaceAll(\"'\", \"''\")\nreturn returnObj;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -144
+      ],
+      "id": "b78c101b-cb29-453b-a667-990884957f94",
+      "name": "Escape response"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Escape response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare prompt": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escape response": {
+      "main": [
+        [
+          {
+            "node": "Update reply in db",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "b19349ff-533c-475d-84ae-24ab1fb5e297",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "923ce2f14aad4726e15646350007925490270b29d0e61ba945dba892143baea9"
+  },
+  "id": "Os98ks6FhDp24nzZ_-6fl",
+  "tags": []
+}
