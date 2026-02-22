@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAP Commerce Cloud SME Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="brand">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>SAP Commerce Cloud</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-content">
+        
+        <header class="page-header">
+            <h1>Code Processor</h1>
+            <p>Input your Hybris code snippets for analysis.</p>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Input Section -->
+            <section class="input-panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-code"></i> Input Code</h3>
+                    <span class="badge">Active</span>
+                </div>
+                
+                <form id="codeForm">
+                    <div class="form-group">
+                        <label for="codeTitle">Task Title / Context</label>
+                        <input type="text" id="codeTitle" placeholder="e.g., Promotion Engine Fix" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="codeSnippet">Code Content</label>
+                        <textarea id="codeSnippet" rows="10" placeholder="// Paste your Java, Impex, or storefront code here..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requestType">Operation Type</label>
+                        <select id="requestType">
+                            <option value="QUERY_COUNT">Count db queries</option>
+                            <option disabled value="BENCHMARK">Benchmark (coming soon)</option>
+                            <option disabled value="COMMENTS">Add comments (coming soon)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-primary">
+                        <i class="fa-solid fa-play"></i> Run Analysis
+                    </button>
+                </form>
+            </section>
+
+            <!-- Output Section -->
+            <section class="output-panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-rotate-right"></i> Execution History</h3>
+                    <span id="historyCount" style="font-size: 0.8rem; color: var(--text-gray);">Loading...</span>
+                </div>
+                
+                <div class="terminal-window" id="terminalWindow">
+                    <div class="terminal-header">
+                        <span class="dot red"></span>
+                        <span class="dot green"></span>
+                        <span class="dot yellow"></span>
+                        <span class="terminal-tab">System Logs</span>
+                    </div>
+                    <div class="terminal-content" id="terminalContent">
+                        <!-- History items will be injected here via JS -->
+                        <div class="log-entry system">
+                            <span class="timestamp">[System]</span>
+                            <p>Connecting to SAP Commerce Cloud API...</p>
+                        </div>
+                    </div>
+                    <div class="copy-actions">
+                        <button id="copyBtn" class="btn-secondary"><i class="fa-regular fa-copy"></i> Copy All Logs</button>
+                        <button id="clearBtn" class="btn-secondary" style="margin-left: 10px; border-color: #ff5f56; color: #ff5f56;"><i class="fa-solid fa-trash"></i> Clear</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
