@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // API Configuration
     // Replace with your actual backend endpoint
-    const HISTORY_API_URL = 'https://hybrisaismeapi.aleespohome.com/api/queryCounts'; 
-    const PROCESS_API_URL = 'https://hybrisaismeapi.aleespohome.com/api/queryCountCheck';
+    const HISTORY_API_URL = 'https://hybrisaismeapi.example.com/api/queryCounts'; 
+    const PROCESS_API_URL = 'https://hybrisaismeapi.example.com/api/queryCountCheck';
 
     /**
      * Helper to add log messages to the terminal
